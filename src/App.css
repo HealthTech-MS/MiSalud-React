@@ -28,6 +28,32 @@
   color: #61dafb;
 }
 
+.Users-header {
+  font-weight: normal;
+  margin-right: 10px;
+}
+
+.Users-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.Users-chart {
+  margin-top: 20px;
+}
+
+.custom-card {
+  width: 250px;
+  background-color: #cce4ff; 
+  border: 2px solid #99ccff; 
+}
+
+.custom-card .ant-card-actions {
+  background-color: #cce4ff; 
+  border-top: 2px solid #99ccff; 
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
