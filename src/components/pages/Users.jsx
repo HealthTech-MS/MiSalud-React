@@ -150,14 +150,12 @@ function Users() {
                     <animated.div style={{ ...messageAnimation, textAlign: 'center', marginTop: '-30px' }}>
                         <h2>{selectedUserName}</h2>
                     </animated.div>
-                    <Row gutter={20} style={{ display: "flex", justifyContent: "center", marginTop: '20px' }}>
-                        <Col span={22} className="number-cards-container">
-                            <animated.div style={messageAnimation}>
-                                <Space direction="vertical" size="middle" className="number-cards">
-                                    <NumberCard title="ID" value={selectedUserId} />
-                                    <NumberCard title="Phone" value={selectedUserPhone} />
-                                    <NumberCard title="Meals" value={selectedUserMeals} />
-                                </Space>
+                    <Row gutter={20} style={{ display: "flex", justifyContent: "flex-start", marginTop: '20px' }}>
+                        <Col span={4} className="user-number-cards-container">
+                            <animated.div style={messageAnimation} className="user-number-cards">
+                                <NumberCard title="ID" value={selectedUserId} />
+                                <NumberCard title="Phone" value={selectedUserPhone} />
+                                <NumberCard title="Meals" value={selectedUserMeals} />
                             </animated.div>
                         </Col>
                     </Row>
