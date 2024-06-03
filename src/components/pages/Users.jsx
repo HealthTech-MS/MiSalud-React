@@ -102,8 +102,8 @@ function Users() {
         localStorage.setItem('showWelcomeMessage', 'true');
         localStorage.setItem('selectedUserName', `${user.firstName} ${user.lastName}`);
         localStorage.setItem('selectedUserId', user.id);
-        //localStorage.setItem('selectedUserPhone', user.phoneNumber);
-        //localStorage.setItem('selectedUserMeals', mealsCount);
+        localStorage.setItem('selectedUserPhone', user.phoneNumber);
+        localStorage.setItem('selectedUserMeals', mealsCount);
     };
 
     const handleBackToCards = () => {
@@ -115,8 +115,8 @@ function Users() {
         localStorage.setItem('showWelcomeMessage', 'false');
         localStorage.removeItem('selectedUserName');
         localStorage.removeItem('selectedUserId');
-        //localStorage.removeItem('selectedUserPhone');
-        //localStorage.removeItem('selectedUserMeals');
+        localStorage.removeItem('selectedUserPhone');
+        localStorage.removeItem('selectedUserMeals');
     };
 
     const cardsAnimation = useSpring({
@@ -151,9 +151,9 @@ function Users() {
                         <h2>{selectedUserName}</h2>
                     </animated.div>
                     <Row gutter={20} style={{ display: "flex", justifyContent: "center", marginTop: '20px' }}>
-                        <Col span={22} style={{ marginLeft: '80px' }}>
+                        <Col span={22} className="number-cards-container">
                             <animated.div style={messageAnimation}>
-                                <Space direction="vertical" size="middle" style={{ display: 'flex' }}>
+                                <Space direction="vertical" size="middle" className="number-cards">
                                     <NumberCard title="ID" value={selectedUserId} />
                                     <NumberCard title="Phone" value={selectedUserPhone} />
                                     <NumberCard title="Meals" value={selectedUserMeals} />
@@ -165,9 +165,9 @@ function Users() {
             )}
 
             <animated.div style={cardsAnimation}>
-                <Row gutter={20} style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
+                <Row gutter={20} className="users-card-container" style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", marginTop: "20px" }}>
                     {dataUsersTable.map(user => (
-                        <Col span={6} key={user.id} style={{ marginBottom: "20px" }}>
+                        <Col xs={24} sm={12} md={8} lg={6} xl={6} key={user.id} className="user-card">
                             <Card
                                 className="custom-card"
                                 actions={[

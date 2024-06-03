@@ -4,6 +4,7 @@ import { Row, Col, Space, Button } from "antd";
 import FixedTable from "../Templates/FixedTable";
 import NumberCard from "../Templates/NumberCard";
 import axios from "axios";
+import "../../Dashboard.css";
 
 function Dashboard() {
     const [numUsers, setNumUsers] = useState(0);
@@ -80,17 +81,15 @@ function Dashboard() {
                 </Col>
             </Row>
             <Row gutter={20} style={{ display: "flex", justifyContent: "center" }}>
-                <Col className="gutter-row" span={4}>
-                    <Space direction="vertical" size="middle" style={{ display: 'flex' }}>
+                <Col className="gutter-row number-cards-container" span={4}>
+                    <Space direction="vertical" size="middle" className="number-cards">
                         <NumberCard title="Total Usuarios" value={numUsers} />
                         <NumberCard title="Total Comidas" value={numMeals} />
                         <NumberCard title="Total Ejercicios" value={numExercises} />
                     </Space>
                 </Col>
-                <Col className="gutter-row" span={2} style={{ display: "flex", alignItems: "center", justifyContent: "center", right: "-30px" }}>
-                    <Button onClick={handlePrev}>◀</Button>
-                </Col>
-                <Col className="gutter-row" span={14} style={{ textAlign: "center" }}>
+                <Col span={18} className="responsive-chart-container">
+                    <Button className="chart-nav-button" onClick={handlePrev}>◀</Button>
                     <StyledChart 
                         xTitle="Días" 
                         yTitle={charts[currentChart].yTitle} 
@@ -99,9 +98,7 @@ function Dashboard() {
                         data={charts[currentChart].data} 
                         maxRange={Math.max(numUsers, numMeals, numExercises) * 1.5} 
                     />
-                </Col>
-                <Col className="gutter-row" span={2} style={{ display: "flex", alignItems: "center", justifyContent: "center", left: "50px" }}>
-                    <Button onClick={handleNext}>▶</Button>
+                    <Button className="chart-nav-button" onClick={handleNext}>▶</Button>
                 </Col>
             </Row>
             <Row gutter={20} style={{ display: "flex", justifyContent: "center" }}>
