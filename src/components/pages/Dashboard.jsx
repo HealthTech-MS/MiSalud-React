@@ -17,11 +17,11 @@ function Dashboard() {
     const [dataUsersTable, setDataUsersTable] = useState([]);
     const [loadingUsersTable, setLoadingUsersTable] = useState(true);
 
-    const [currentChart, setCurrentChart] = useState(0); // Estado para la gráfica actual
+    const [currentChart, setCurrentChart] = useState(0); 
 
     async function getCardData() {
         axios({
-            url: "https://ms-people.onrender.com/api/v1/people/ui/data?type=numberCard",
+            url: "https://ms-people.vercel.app/api/v1/people/ui/data?type=numberCard",
             method: "GET",
         })
         .then((response) => {
@@ -37,7 +37,7 @@ function Dashboard() {
         }
 
         axios({
-            url: `https://ms-people.onrender.com/api/v1/people/ui/data?type=${chartType}`,
+            url: `https://ms-people.vercel.app/api/v1/people/ui/data?type=${chartType}`,
             method: "GET",
         })
         .then((response) => {
@@ -52,7 +52,7 @@ function Dashboard() {
         getCardData();
         getGenericData("usersChart", setDataUsersChart, "timeseries");
         getGenericData("mealsChart", setDataMealsChart, "timeseries");
-        getGenericData("exercisesChart", setDataExercisesChart, "timeseries");
+        getGenericData("mealsChart", setDataExercisesChart, "timeseries");
         getGenericData("usersTable", setDataUsersTable, "users", setLoadingUsersTable);
     }, []);
 

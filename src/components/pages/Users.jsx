@@ -27,7 +27,7 @@ function Users() {
         }
 
         axios({
-            url: `https://ms-people.onrender.com/api/v1/people/ui/data?type=${chartType}`,
+            url: `https://ms-people.vercel.app/api/v1/people/ui/data?type=${chartType}`,
             method: "GET",
         })
         .then((response) => {
@@ -46,7 +46,7 @@ function Users() {
 
     async function getUserMeals(userId) {
         return axios({
-            url: `https://ms-people.onrender.com/api/v1/people/ui/data?type=userMeals&userId=${userId}`,
+            url: `https://ms-people.vercel.app/api/v1/people/ui/data?type=userMeals&userId=${userId}`,
             method: "GET",
         })
         .then((response) => {
