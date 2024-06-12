@@ -3,10 +3,10 @@ import { Row, Col, Card, Avatar, Modal, Input, Button, Space } from "antd";
 import React, { useState, useEffect } from "react";
 import { EditOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import '../../App.css';
+import '../../Dashboard.css';
 import { useSpring, animated } from '@react-spring/web';
 import NumberCard from '../Templates/NumberCard';
 import MealsTable from '../Templates/MealsTable';
-import StyledChart from '../Templates/StyledChart';
 import SatisfactionChart from '../Templates/SatisfactionChart';
 
 const { Meta } = Card;   // https://ms-people.vercel.app , http://localhost:5001
@@ -26,6 +26,8 @@ function Users() {
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedUserMeals, setSelectedUserMeals] = useState([]);
     const [userMealsChartData, setUserMealsChartData] = useState([]);
+    const [currentChartPage, setCurrentChartPage] = useState(0);
+    const itemsPerPage = 5; 
 
     async function getGenericData(chartType, dataSetter, responseTitle, loadingSetter=undefined) {
         if (loadingSetter !== undefined) {
@@ -149,6 +151,14 @@ function Users() {
         setFilteredDataUsersTable(filteredUsers);
     };
 
+    const handlePrevPage = () => {
+        setCurrentChartPage((prev) => (prev === 0 ? Math.ceil(userMealsChartData.length / itemsPerPage) - 1 : prev - 1));
+    };
+    
+    const handleNextPage = () => {
+        setCurrentChartPage((prev) => (prev === Math.ceil(userMealsChartData.length / itemsPerPage) - 1 ? 0 : prev + 1));
+    };
+
     return (
         <>
             <Row gutter={20} style={{ display: "flex", justifyContent: "center", marginTop: '20px' }}>
@@ -184,12 +194,16 @@ function Users() {
                                 {userAverageScore !== null && <NumberCard title="Promedio de percepción" value={userAverageScore.toFixed(2)} />}
                             </animated.div>
                         </Col>
-                        <Col span={16} className="graph-wrapper">
+                        <Col span={18} className="responsive-chart-container">
+                            <Button className="chart-nav-button" onClick={handlePrevPage}>◀</Button>
                             <SatisfactionChart
                                 width={700}
                                 height={300}
                                 data={userMealsChartData}
+                                currentPage={currentChartPage}
+                                itemsPerPage={itemsPerPage}
                             />
+                            <Button className="chart-nav-button" onClick={handleNextPage}>▶</Button>
                         </Col>
                     </Row>
                     <Row style={{ display: "flex", justifyContent: "center", marginTop: '20px' }}>  
@@ -231,6 +245,7 @@ function Users() {
         </>
     );
 }
+
 
 
 export default Users;
