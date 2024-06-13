@@ -22,10 +22,6 @@ const columns = [
     dataIndex: 'phoneNumber',
     width: 150,
   },
-  // {
-  //   title: 'Address',
-  //   dataIndex: 'address',
-  // },
 ];
 
 
