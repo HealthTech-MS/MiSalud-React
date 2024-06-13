@@ -31,6 +31,11 @@ const Login = () => {
           'Content-Type': 'application/json'
         }
       });
+
+      if(response.data.role != "Doctor"){
+        setError('No tienes acceso a este portal');
+        return
+      }
       
       if (response.data.accessToken && response.data.refreshToken) {
         localStorage.setItem('accessToken', response.data.accessToken);
