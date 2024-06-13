@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Row, Col, Card, Avatar, Modal, Input, Button, Space } from "antd";
+import { Row, Col, Card, Modal, Input, Button } from "antd";
 import React, { useState, useEffect } from "react";
 import { EditOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import '../../App.css';
@@ -8,6 +8,7 @@ import { useSpring, animated } from '@react-spring/web';
 import NumberCard from '../Templates/NumberCard';
 import MealsTable from '../Templates/MealsTable';
 import SatisfactionChart from '../Templates/SatisfactionChart';
+import peopleInstance from "../../singletons/AxiosPeople";
 
 const { Meta } = Card;   // https://ms-people.vercel.app , http://localhost:5001
 
@@ -34,11 +35,7 @@ function Users() {
             setLoadingUsersTable(true);
         }
 
-        axios({
-            url: `https://ms-people.vercel.app/api/v1/people/ui/data/dashboard?type=${chartType}`, 
-
-            method: "GET",
-        })
+        peopleInstance.get(`/ui/data/dashboard?type=${chartType}`)
         .then((response) => {
             const users = response.data[responseTitle];
             const savedDescriptions = JSON.parse(localStorage.getItem('userDescriptions')) || {};
@@ -98,13 +95,13 @@ function Users() {
         setSelectedUserPhone(user.phoneNumber);
     
         try {
-            const mealsResponse = await axios.get(`http://localhost:5001/api/v1/people/ui/data/dashboard?type=userMeal&userId=${user.id}`);
+            const mealsResponse = await peopleInstance.get(`/ui/data/dashboard?type=userMeal&userId=${user.id}`);
             setSelectedUserMeals(mealsResponse.data.meals);
     
-            const chartResponse = await axios.get(`http://localhost:5001/api/v1/people/ui/data/userMealsChart?userId=${user.id}`);
+            const chartResponse = await peopleInstance.get(`/ui/data/userMealsChart?userId=${user.id}`);
             setUserMealsChartData(chartResponse.data.meals);
     
-            const averageScoreResponse = await axios.get(`http://localhost:5001/api/v1/people/ui/data/userAverageScore?userId=${user.id}`);
+            const averageScoreResponse = await peopleInstance.get(`/ui/data/userAverageScore?userId=${user.id}`);
             setUserAverageScore(averageScoreResponse.data.averageScore);
         } catch (error) {
             console.error("Error fetching user meals or chart data", error);

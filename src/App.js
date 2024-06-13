@@ -13,12 +13,20 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
-        <Route path="/" element={<Navigate to="/dashboard" />} />
+        <Route path="/" element={<Navigate to="/login" />} />
         <Route element={<PrivateRoute />}>
-          <Route path="/" element={<PrivateLayout />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/users" element={<Users />} />
-          </Route>
+          <Route path="/dashboard" element={
+            <PrivateLayout>
+              <Dashboard />
+            </PrivateLayout>
+          }/>
+        </Route>
+        <Route element={<PrivateRoute />}>
+          <Route path="/users" element={
+            <PrivateLayout>
+              <Users />
+            </PrivateLayout>
+          }/>
         </Route>
       </Routes>
     </BrowserRouter>

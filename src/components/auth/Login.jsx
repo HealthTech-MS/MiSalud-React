@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Input, Button, Spin, Alert } from 'antd';
 import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 import './Login.css';
 import logo from '../assets/misalud_transparent.png';
+import { useEffect } from 'react';
+import authInstance from '../../singletons/AxiosAuth';
 
 const Login = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -13,18 +14,24 @@ const Login = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if(localStorage.getItem("accessToken") != undefined && localStorage.getItem("refreshToken") != undefined){
+      navigate('/dashboard');
+    }
+  });
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+
     try {
-      const response = await axios.post('https://ms-auth-seven.vercel.app/api/v1/auth/login', { phoneNumber, password }, {
+      const response = await authInstance.post('/auth/login', { phoneNumber, password }, {
         headers: {
           'Content-Type': 'application/json'
         }
       });
       
-      console.log('Response:', response.data);
       if (response.data.accessToken && response.data.refreshToken) {
         localStorage.setItem('accessToken', response.data.accessToken);
         localStorage.setItem('refreshToken', response.data.refreshToken);
@@ -34,7 +41,6 @@ const Login = () => {
         setError('Número de teléfono o contraseña incorrectos');
       }
     } catch (error) {
-      console.error('Error during login:', error.response?.data || error.message);
       setError('Error al iniciar sesión. Inténtalo de nuevo más tarde.');
     } finally {
       setLoading(false);
@@ -62,13 +68,14 @@ const Login = () => {
             />
           </div>
           <div className="input-group">
-            <Input.Password
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Contraseña"
-              iconRender={visible => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
-              required
-            />
+          <Input.Password
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Contraseña"
+            iconRender={visible => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
+            required
+            className="custom-input"
+          />
           </div>
           {error && <Alert message={error} type="error" showIcon />}
           <Button type="primary" htmlType="submit" className="login-button" disabled={loading}>

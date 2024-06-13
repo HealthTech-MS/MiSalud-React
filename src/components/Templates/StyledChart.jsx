@@ -2,7 +2,6 @@ import React from "react";
 import { XYPlot, LineSeries, HorizontalGridLines, XAxis, YAxis, VerticalGridLines, AreaSeries } from 'react-vis';
 
 function StyledChart(props) {
-    console.log('Data received by StyledChart:', props.data); 
     return (
         <XYPlot 
             animation={true} 

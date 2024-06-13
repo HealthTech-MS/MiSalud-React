@@ -1,10 +1,10 @@
+import "../../Dashboard.css";
 import React, { useEffect, useState } from "react";
 import StyledChart from "../Templates/StyledChart";
 import { Row, Col, Space, Button } from "antd";
 import FixedTable from "../Templates/FixedTable";
 import NumberCard from "../Templates/NumberCard";
-import axios from "axios";
-import "../../Dashboard.css";
+import peopleInstance from "../../singletons/AxiosPeople"
 
 function Dashboard() {
     const [numUsers, setNumUsers] = useState(0);
@@ -20,10 +20,7 @@ function Dashboard() {
     const [currentChart, setCurrentChart] = useState(0); 
 
     async function getCardData() {
-        axios({
-            url: " https://ms-people.vercel.app/api/v1/people/ui/data/dashboard?type=numberCard",
-            method: "GET",
-        })
+        peopleInstance.get("/ui/data/dashboard?type=numberCard")
         .then((response) => {
             setNumUsers(response.data.users);
             setNumMeals(response.data.meals);
@@ -35,11 +32,7 @@ function Dashboard() {
         if (loadingSetter !== undefined) {
             setLoadingUsersTable(true);
         }
-
-        axios({
-            url: ` https://ms-people.vercel.app/api/v1/people/ui/data/dashboard?type=${chartType}`,
-            method: "GET",
-        })
+        peopleInstance.get(`/ui/data/dashboard?type=${chartType}`)
         .then((response) => {
             dataSetter(response.data[responseTitle]);
             if (loadingSetter !== undefined) {
@@ -52,7 +45,7 @@ function Dashboard() {
         getCardData();
         getGenericData("usersChart", setDataUsersChart, "timeseries");
         getGenericData("mealsChart", setDataMealsChart, "timeseries");
-        getGenericData("mealsChart", setDataExercisesChart, "timeseries");
+        getGenericData("exercisesChart", setDataExercisesChart, "timeseries");
         getGenericData("usersTable", setDataUsersTable, "users", setLoadingUsersTable);
     }, []);
 
