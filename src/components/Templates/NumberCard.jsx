@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Col, Row, Space } from 'antd';
+import { Card } from 'antd';
 
 function NumberCard(props){
     return(
