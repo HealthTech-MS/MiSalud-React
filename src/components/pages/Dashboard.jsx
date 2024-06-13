@@ -21,7 +21,7 @@ function Dashboard() {
 
     async function getCardData() {
         axios({
-            url: " http://localhost:5001/api/v1/people/ui/data/dashboard?type=numberCard",
+            url: " https://ms-people.vercel.app/api/v1/people/ui/data/dashboard?type=numberCard",
             method: "GET",
         })
         .then((response) => {
@@ -37,7 +37,7 @@ function Dashboard() {
         }
 
         axios({
-            url: ` http://localhost:5001/api/v1/people/ui/data/dashboard?type=${chartType}`,
+            url: ` https://ms-people.vercel.app/api/v1/people/ui/data/dashboard?type=${chartType}`,
             method: "GET",
         })
         .then((response) => {

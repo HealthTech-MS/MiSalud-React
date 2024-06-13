@@ -35,7 +35,7 @@ function Users() {
         }
 
         axios({
-            url: `http://localhost:5001/api/v1/people/ui/data/dashboard?type=${chartType}`, 
+            url: `https://ms-people.vercel.app/api/v1/people/ui/data/dashboard?type=${chartType}`, 
 
             method: "GET",
         })
@@ -225,7 +225,7 @@ function Users() {
                                 ]}
                             >
                                 <Meta
-                                    avatar={<Avatar src={`https://api.dicebear.com/7.x/miniavs/svg?seed=${user.id}`} />}
+                                    // avatar={<Avatar src={`https://api.dicebear.com/7.x/miniavs/svg?seed=${user.id}`} />}
                                     title={<a onClick={() => handleUserClick(user)} style={{ color: 'black'}}>{`${user.firstName} ${user.lastName}`}</a>}
                                     description={user.description}
                                 />
