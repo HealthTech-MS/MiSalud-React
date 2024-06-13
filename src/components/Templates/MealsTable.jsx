@@ -1,55 +1,39 @@
 import React from "react";
 import { Table } from 'antd';
 
-const columns = [
-  {
-    title: 'ID',
-    dataIndex: 'id',
-    width: 10,
-  },
-  {
-    title: 'UUID',
-    dataIndex: 'uuid',
-    width: 25,
-  },
-  {
-    title: 'Nombre',
-    dataIndex: 'name',
-    width: 50,
-  },
-  {
-    title: 'Tipo',
-    dataIndex: 'type',
-    width: 50,
-  },
-  {
-    title: 'Puntuación',
-    dataIndex: 'score',
-    width: 25,
-  },
-  {
-    title: 'Fecha de Creación',
-    dataIndex: 'createdAt',
-    width: 50,
-  },
-  {
-    title: 'Fecha de Actualización',
-    dataIndex: 'updatedAt',
-    width: 50,
-  },
-];
+const MealsTable = ({ meals }) => {
+  const columns = [
+      {
+          title: 'ID',
+          dataIndex: 'id',
+          key: 'id',
+      },
+      {
+          title: 'Nombre',
+          dataIndex: 'name',
+          key: 'name',
+      },
+      {
+          title: 'Tipo',
+          dataIndex: 'type',
+          key: 'type',
+      },
+      {
+          title: 'Fecha',
+          dataIndex: 'createdAt',
+          key: 'createdAt',
+          render: (text) => new Date(text).toLocaleString(),
+      },
+  ];
 
-function MealsTable(props) {
   return (
-    <Table
-      loading={props.loading}
-      columns={columns}
-      dataSource={props.data}
-      pagination={{ pageSize: 10 }}
-      scroll={{ y: 325 }}
-      rowKey="id"
-    />
+      <Table
+          columns={columns}
+          dataSource={meals}
+          pagination={false}
+          rowKey="id"
+      />
   );
-}
+};
 
 export default MealsTable;

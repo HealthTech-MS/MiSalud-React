@@ -3,14 +3,17 @@ import { Row, Col, Card, Avatar, Modal, Input, Button, Space } from "antd";
 import React, { useState, useEffect } from "react";
 import { EditOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import '../../App.css';
+import '../../Dashboard.css';
 import { useSpring, animated } from '@react-spring/web';
 import NumberCard from '../Templates/NumberCard';
 import MealsTable from '../Templates/MealsTable';
+import SatisfactionChart from '../Templates/SatisfactionChart';
 
-const { Meta } = Card;
+const { Meta } = Card;   // https://ms-people.vercel.app , http://localhost:5001
 
 function Users() {
     const [dataUsersTable, setDataUsersTable] = useState([]);
+    const [filteredDataUsersTable, setFilteredDataUsersTable] = useState([]);
     const [loadingUsersTable, setLoadingUsersTable] = useState(true);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [currentUser, setCurrentUser] = useState(null);
@@ -19,7 +22,12 @@ function Users() {
     const [selectedUserName, setSelectedUserName] = useState("");
     const [selectedUserId, setSelectedUserId] = useState("");
     const [selectedUserPhone, setSelectedUserPhone] = useState("");
-    const [selectedUserMeals, setSelectedUserMeals] = useState(0);
+    const [userAverageScore, setUserAverageScore] = useState(null);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [selectedUserMeals, setSelectedUserMeals] = useState([]);
+    const [userMealsChartData, setUserMealsChartData] = useState([]);
+    const [currentChartPage, setCurrentChartPage] = useState(0);
+    const itemsPerPage = 5; 
 
     async function getGenericData(chartType, dataSetter, responseTitle, loadingSetter=undefined) {
         if (loadingSetter !== undefined) {
@@ -27,7 +35,8 @@ function Users() {
         }
 
         axios({
-            url: `https://ms-people.vercel.app/api/v1/people/ui/data?type=${chartType}`,
+            url: `https://ms-people.vercel.app/api/v1/people/ui/data/dashboard?type=${chartType}`, 
+
             method: "GET",
         })
         .then((response) => {
@@ -38,19 +47,10 @@ function Users() {
                 description: savedDescriptions[user.id] || "This is the description"
             }));
             dataSetter(usersWithDescriptions);
+            setFilteredDataUsersTable(usersWithDescriptions);
             if (loadingSetter !== undefined) {
                 setLoadingUsersTable(false);
             }
-        });
-    }
-
-    async function getUserMeals(userId) {
-        return axios({
-            url: `https://ms-people.vercel.app/api/v1/people/ui/data?type=userMeals&userId=${userId}`,
-            method: "GET",
-        })
-        .then((response) => {
-            return response.data.meals;
         });
     }
 
@@ -62,11 +62,9 @@ function Users() {
             const savedSelectedUserName = localStorage.getItem('selectedUserName');
             const savedSelectedUserId = localStorage.getItem('selectedUserId');
             const savedSelectedUserPhone = localStorage.getItem('selectedUserPhone');
-            const savedSelectedUserMeals = localStorage.getItem('selectedUserMeals');
             setSelectedUserName(savedSelectedUserName || "");
             setSelectedUserId(savedSelectedUserId || "");
             setSelectedUserPhone(savedSelectedUserPhone || "");
-            setSelectedUserMeals(savedSelectedUserMeals || 0);
         }
     }, []);
 
@@ -81,6 +79,7 @@ function Users() {
             user.id === currentUser.id ? { ...user, description: newDescription } : user
         );
         setDataUsersTable(updatedUsers);
+        setFilteredDataUsersTable(updatedUsers);
         setIsModalVisible(false);
 
         const savedDescriptions = JSON.parse(localStorage.getItem('userDescriptions')) || {};
@@ -97,13 +96,24 @@ function Users() {
         setSelectedUserName(`${user.firstName} ${user.lastName}`);
         setSelectedUserId(user.id);
         setSelectedUserPhone(user.phoneNumber);
-        const mealsCount = await getUserMeals(user.id);
-        setSelectedUserMeals(mealsCount);
+    
+        try {
+            const mealsResponse = await axios.get(`http://localhost:5001/api/v1/people/ui/data/dashboard?type=userMeal&userId=${user.id}`);
+            setSelectedUserMeals(mealsResponse.data.meals);
+    
+            const chartResponse = await axios.get(`http://localhost:5001/api/v1/people/ui/data/userMealsChart?userId=${user.id}`);
+            setUserMealsChartData(chartResponse.data.meals);
+    
+            const averageScoreResponse = await axios.get(`http://localhost:5001/api/v1/people/ui/data/userAverageScore?userId=${user.id}`);
+            setUserAverageScore(averageScoreResponse.data.averageScore);
+        } catch (error) {
+            console.error("Error fetching user meals or chart data", error);
+        }
+    
         localStorage.setItem('showWelcomeMessage', 'true');
         localStorage.setItem('selectedUserName', `${user.firstName} ${user.lastName}`);
         localStorage.setItem('selectedUserId', user.id);
         localStorage.setItem('selectedUserPhone', user.phoneNumber);
-        localStorage.setItem('selectedUserMeals', mealsCount);
     };
 
     const handleBackToCards = () => {
@@ -111,12 +121,12 @@ function Users() {
         setSelectedUserName("");
         setSelectedUserId("");
         setSelectedUserPhone("");
-        setSelectedUserMeals(0);
+        setSelectedUserMeals([]);
+        setUserMealsChartData([]); 
         localStorage.setItem('showWelcomeMessage', 'false');
         localStorage.removeItem('selectedUserName');
         localStorage.removeItem('selectedUserId');
         localStorage.removeItem('selectedUserPhone');
-        localStorage.removeItem('selectedUserMeals');
     };
 
     const cardsAnimation = useSpring({
@@ -131,16 +141,42 @@ function Users() {
         config: { duration: 500 }
     });
 
+    const handleSearch = (e) => {
+        const term = e.target.value.toLowerCase();
+        setSearchTerm(term);
+        const filteredUsers = dataUsersTable.filter(user =>
+            user.firstName.toLowerCase().includes(term) ||
+            user.lastName.toLowerCase().includes(term)
+        );
+        setFilteredDataUsersTable(filteredUsers);
+    };
+
+    const handlePrevPage = () => {
+        setCurrentChartPage((prev) => (prev === 0 ? Math.ceil(userMealsChartData.length / itemsPerPage) - 1 : prev - 1));
+    };
+    
+    const handleNextPage = () => {
+        setCurrentChartPage((prev) => (prev === Math.ceil(userMealsChartData.length / itemsPerPage) - 1 ? 0 : prev + 1));
+    };
+
     return (
         <>
             <Row gutter={20} style={{ display: "flex", justifyContent: "center", marginTop: '20px' }}>
                 <Col span={22}>
-                    <Row align="middle">
+                    <Row align="middle" style={{ width: '100%' }}>
                         {showWelcomeMessage && (
                             <Button type="link" icon={<ArrowLeftOutlined />} onClick={handleBackToCards} />
                         )}
                         <h1 style={{ fontWeight: "normal" }}>Bienvenido&nbsp;</h1>
-                        <h1>Ricardo</h1>
+                        <h1>Doctor</h1>
+                        <div className="search-bar">
+                            <Input
+                                placeholder="Buscar usuario"
+                                value={searchTerm}
+                                onChange={handleSearch}
+                                className="search-bar-input"
+                            />
+                        </div>
                     </Row>
                 </Col>
             </Row>
@@ -150,13 +186,29 @@ function Users() {
                     <animated.div style={{ ...messageAnimation, textAlign: 'center', marginTop: '-30px' }}>
                         <h2>{selectedUserName}</h2>
                     </animated.div>
-                    <Row gutter={20} style={{ display: "flex", justifyContent: "flex-start", marginTop: '20px' }}>
+                    <Row gutter={20} className="user-info-container">
                         <Col span={4} className="user-number-cards-container">
                             <animated.div style={messageAnimation} className="user-number-cards">
                                 <NumberCard title="ID" value={selectedUserId} />
                                 <NumberCard title="Phone" value={selectedUserPhone} />
-                                <NumberCard title="Meals" value={selectedUserMeals} />
+                                {userAverageScore !== null && <NumberCard title="Promedio de percepción" value={userAverageScore.toFixed(2)} />}
                             </animated.div>
+                        </Col>
+                        <Col span={18} className="responsive-chart-container">
+                            <Button className="chart-nav-button" onClick={handlePrevPage}>◀</Button>
+                            <SatisfactionChart
+                                width={700}
+                                height={300}
+                                data={userMealsChartData}
+                                currentPage={currentChartPage}
+                                itemsPerPage={itemsPerPage}
+                            />
+                            <Button className="chart-nav-button" onClick={handleNextPage}>▶</Button>
+                        </Col>
+                    </Row>
+                    <Row style={{ display: "flex", justifyContent: "center", marginTop: '20px' }}>  
+                        <Col span={20}>
+                            <MealsTable meals={selectedUserMeals} />
                         </Col>
                     </Row>
                 </>
@@ -164,7 +216,7 @@ function Users() {
 
             <animated.div style={cardsAnimation}>
                 <Row gutter={20} className="users-card-container" style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", marginTop: "20px" }}>
-                    {dataUsersTable.map(user => (
+                    {filteredDataUsersTable.map(user => (
                         <Col xs={24} sm={12} md={8} lg={6} xl={6} key={user.id} className="user-card">
                             <Card
                                 className="custom-card"
@@ -173,7 +225,7 @@ function Users() {
                                 ]}
                             >
                                 <Meta
-                                    avatar={<Avatar src={`https://api.dicebear.com/7.x/miniavs/svg?seed=${user.id}`} />}
+                                    // avatar={<Avatar src={`https://api.dicebear.com/7.x/miniavs/svg?seed=${user.id}`} />}
                                     title={<a onClick={() => handleUserClick(user)} style={{ color: 'black'}}>{`${user.firstName} ${user.lastName}`}</a>}
                                     description={user.description}
                                 />
@@ -193,5 +245,7 @@ function Users() {
         </>
     );
 }
+
+
 
 export default Users;
