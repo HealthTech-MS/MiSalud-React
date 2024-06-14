@@ -1,8 +1,9 @@
 
+
 import React from "react";
 import { Table } from 'antd';
 
-const MealsTable = ({ meals }) => {
+const ExercisesTable = ({ exercises }) => {
     const columns = [
         {
             title: 'ID',
@@ -15,9 +16,10 @@ const MealsTable = ({ meals }) => {
             key: 'name',
         },
         {
-            title: 'Tipo',
-            dataIndex: 'type',
-            key: 'type',
+            title: 'Duración',
+            dataIndex: 'duration',
+            key: 'duration',
+            render: (duration) => `${duration} mins`,
         },
         {
             title: 'Fecha',
@@ -30,12 +32,12 @@ const MealsTable = ({ meals }) => {
     return (
         <Table
             columns={columns}
-            dataSource={meals}
+            dataSource={exercises}
             pagination={false}
             rowKey="id"
-            scroll={{ y: 240 }} 
+            scroll={{ y: 240 }} // Altura máxima para mostrar el scroll
         />
     );
 };
 
-export default MealsTable;
+export default ExercisesTable;

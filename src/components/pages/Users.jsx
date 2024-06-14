@@ -8,6 +8,8 @@ import { useSpring, animated } from '@react-spring/web';
 import NumberCard from '../Templates/NumberCard';
 import MealsTable from '../Templates/MealsTable';
 import SatisfactionChart from '../Templates/SatisfactionChart';
+import ExercisesTable from '../Templates/ExercisesTable';
+import ExerciseChart from '../Templates/ExerciseChart';
 
 const { Meta } = Card;   // https://ms-people.vercel.app , http://localhost:5001
 
@@ -27,6 +29,9 @@ function Users() {
     const [selectedUserMeals, setSelectedUserMeals] = useState([]);
     const [userMealsChartData, setUserMealsChartData] = useState([]);
     const [currentChartPage, setCurrentChartPage] = useState(0);
+    const [selectedUserExercises, setSelectedUserExercises] = useState([]);
+    const [userExercisesChartData, setUserExercisesChartData] = useState([]);
+    const [showMealChart, setShowMealChart] = useState(true);
     const itemsPerPage = 5; 
 
     async function getGenericData(chartType, dataSetter, responseTitle, loadingSetter=undefined) {
@@ -106,6 +111,12 @@ function Users() {
     
             const averageScoreResponse = await axios.get(`http://localhost:5001/api/v1/people/ui/data/userAverageScore?userId=${user.id}`);
             setUserAverageScore(averageScoreResponse.data.averageScore);
+    
+            const exercisesResponse = await axios.get(`http://localhost:5001/api/v1/people/ui/data/userExercises?userId=${user.id}`);
+            setSelectedUserExercises(exercisesResponse.data.exercises);
+    
+            const exercisesChartResponse = await axios.get(`http://localhost:5001/api/v1/people/ui/data/userExercisesChart?userId=${user.id}`);
+            setUserExercisesChartData(exercisesChartResponse.data.exercises);
         } catch (error) {
             console.error("Error fetching user meals or chart data", error);
         }
@@ -122,7 +133,9 @@ function Users() {
         setSelectedUserId("");
         setSelectedUserPhone("");
         setSelectedUserMeals([]);
-        setUserMealsChartData([]); 
+        setSelectedUserExercises([]);
+        setUserMealsChartData([]);
+        setUserExercisesChartData([]);
         localStorage.setItem('showWelcomeMessage', 'false');
         localStorage.removeItem('selectedUserName');
         localStorage.removeItem('selectedUserId');
@@ -192,23 +205,49 @@ function Users() {
                                 <NumberCard title="ID" value={selectedUserId} />
                                 <NumberCard title="Phone" value={selectedUserPhone} />
                                 {userAverageScore !== null && <NumberCard title="Promedio de percepción" value={userAverageScore.toFixed(2)} />}
+                                <div style={{ textAlign: 'right', marginBottom: '10px' }}>
+                                    <Button onClick={() => setShowMealChart(!showMealChart)}>
+                                        {showMealChart ? "Mostrar gráfica de ejercicios" : "Mostrar gráfica de comidas"}
+                                    </Button>
+                                </div>
                             </animated.div>
                         </Col>
                         <Col span={18} className="responsive-chart-container">
-                            <Button className="chart-nav-button" onClick={handlePrevPage}>◀</Button>
-                            <SatisfactionChart
-                                width={700}
-                                height={300}
-                                data={userMealsChartData}
-                                currentPage={currentChartPage}
-                                itemsPerPage={itemsPerPage}
-                            />
-                            <Button className="chart-nav-button" onClick={handleNextPage}>▶</Button>
+                            {showMealChart ? (
+                                <>
+                                    <Button className="chart-nav-button" onClick={handlePrevPage}>◀</Button>
+                                    <SatisfactionChart
+                                        width={700}
+                                        height={300}
+                                        data={userMealsChartData}
+                                        currentPage={currentChartPage}
+                                        itemsPerPage={itemsPerPage}
+                                    />
+                                    <Button className="chart-nav-button" onClick={handleNextPage}>▶</Button>
+                                </>
+                            ) : (
+                                <>
+                                    <Button className="chart-nav-button" onClick={handlePrevPage}>◀</Button>
+                                    <ExerciseChart
+                                        width={700}
+                                        height={300}
+                                        data={userExercisesChartData}
+                                        currentPage={currentChartPage}
+                                        itemsPerPage={itemsPerPage}
+                                    />
+                                    <Button className="chart-nav-button" onClick={handleNextPage}>▶</Button>
+                                </>
+                            )}
                         </Col>
                     </Row>
-                    <Row style={{ display: "flex", justifyContent: "center", marginTop: '20px' }}>  
+                    <Row style={{ display: "flex", justifyContent: "center", marginTop: '20px' }}>
                         <Col span={20}>
                             <MealsTable meals={selectedUserMeals} />
+                        </Col>
+                    </Row>
+                    <Row style={{ display: "flex", justifyContent: "center", marginTop: '20px' }}>
+                        <Col span={20}>
+                            <ExercisesTable exercises={selectedUserExercises} />
                         </Col>
                     </Row>
                 </>
@@ -226,7 +265,7 @@ function Users() {
                             >
                                 <Meta
                                     avatar={<Avatar src={`https://api.dicebear.com/7.x/miniavs/svg?seed=${user.id}`} />}
-                                    title={<a onClick={() => handleUserClick(user)} style={{ color: 'black'}}>{`${user.firstName} ${user.lastName}`}</a>}
+                                    title={<a onClick={() => handleUserClick(user)} style={{ color: 'black' }}>{`${user.firstName} ${user.lastName}`}</a>}
                                     description={user.description}
                                 />
                             </Card>
@@ -245,7 +284,5 @@ function Users() {
         </>
     );
 }
-
-
 
 export default Users;
